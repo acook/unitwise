@@ -75,8 +75,8 @@ module ScaleTests
 
       describe "#depth" do
         it "must return a number indicating how far down the rabbit hole goes" do
-          subject.depth.must_equal 11
-          k.depth.must_equal 3
+          subject.depth.must_equal 14
+          k.depth.must_equal 4
         end
       end
 

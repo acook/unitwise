@@ -73,7 +73,7 @@ module Unitwise
     # @return [true, false]
     # @api public
     def terminal?
-      depth <= 3
+      depth <= 4
     end
 
     # A representation of an atoms composition. Used to determine if two

@@ -2,16 +2,10 @@ require 'test_helper'
 
 describe Unitwise::Term do
   describe "instance" do
-    subject { Unitwise::Term.new(atom: 'J', prefix: 'k')}
-    describe "#atom" do
-      it "should be an atom" do
-        subject.atom.must_be_instance_of Unitwise::Atom
-      end
-    end
-
-    describe "#prefix" do
-      it "should be a prefix" do
-        subject.prefix.must_be_instance_of Unitwise::Prefix
+    subject { Unitwise::Term.new('kJ')}
+    describe "#compound" do
+      it "should be a compound" do
+        subject.compound.must_be_instance_of Unitwise::Compound
       end
     end
 

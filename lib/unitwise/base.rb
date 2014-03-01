@@ -45,6 +45,5 @@ module Unitwise
     def to_s
       primary_code
     end
-
   end
 end

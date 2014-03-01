@@ -8,13 +8,8 @@ module Unitwise
 
       root :expression
 
-      rule (:atom) { Matcher.atom(key).as(:atom_code) }
-      rule (:metric_atom) { Matcher.metric_atom(key).as(:atom_code) }
-      rule (:prefix) { Matcher.prefix(key).as(:prefix_code) }
-
-      rule (:simpleton) do
-        (prefix.as(:prefix) >> metric_atom.as(:atom) | atom.as(:atom))
-      end
+      rule (:compound_code) { Matcher.compound(key).as(:compound_code) }
+      rule (:compound)      { compound_code.as(:compound) }
 
       rule (:annotation) do
         str('{') >> match['^}'].repeat.as(:annotation) >> str('}')
@@ -37,7 +32,7 @@ module Unitwise
       rule (:operator) { (str('.') | str('/')).as(:operator) }
 
       rule (:term) do
-        ((factor >> simpleton | simpleton | factor) >> exponent.maybe >> annotation.maybe).as(:term)
+        ((factor >> compound | compound | factor) >> exponent.maybe >> annotation.maybe).as(:term)
       end
 
       rule (:group) do

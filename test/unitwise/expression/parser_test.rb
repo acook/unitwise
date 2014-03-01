@@ -1,24 +1,19 @@
 require 'test_helper'
 
 describe Unitwise::Expression::Parser do
-  subject { Unitwise::Expression::Parser.new}
-  describe '#metric_atom' do
-    it "must match 'N'" do
-      subject.metric_atom.parse('N')[:atom_code].must_equal('N')
+  subject { Unitwise::Expression::Parser.new }
+  describe '#compound' do
+    it "must match non-prefixed metrics" do
+      subject.compound.parse('N')[:compound][:compound_code].must_equal('N')
+    end
+    it "must match non-prefixed non-metrics" do
+      subject.compound.parse('[in_i]')[:compound][:compound_code].must_equal('[in_i]')
+    end
+    it "must match prefixed metrics" do
+      subject.compound.parse('kW')[:compound][:compound_code].must_equal('kW')
     end
   end
 
-  describe '#atom' do
-    it "must match '[in_i]'" do
-      subject.atom.parse('[in_i]')[:atom_code].must_equal('[in_i]')
-    end
-  end
-
-  describe '#prefix' do
-    it "must match 'k'" do
-      subject.prefix.parse('k')[:prefix_code].must_equal('k')
-    end
-  end
 
   describe '#annotation' do
     it "must match '{foobar}'" do
@@ -46,17 +41,15 @@ describe Unitwise::Expression::Parser do
 
   describe "term" do
     it "must match basic atoms" do
-      subject.term.parse('[in_i]')[:term][:atom][:atom_code].must_equal('[in_i]')
+      subject.term.parse('[in_i]')[:term][:compound][:compound_code].must_equal('[in_i]')
     end
     it "must match prefixed atoms" do
       match = subject.term.parse('ks')[:term]
-      match[:atom][:atom_code].must_equal('s')
-      match[:prefix][:prefix_code].must_equal('k')
+      match[:compound][:compound_code].must_equal('ks')
     end
     it "must match exponential atoms" do
       match = subject.term.parse('cm3')[:term]
-      match[:atom][:atom_code].must_equal 'm'
-      match[:prefix][:prefix_code].must_equal 'c'
+      match[:compound][:compound_code].must_equal 'cm'
       match[:exponent][:integer].must_equal '3'
     end
     it "must match factors" do
@@ -64,7 +57,7 @@ describe Unitwise::Expression::Parser do
     end
     it "must match annotations" do
       match = subject.term.parse('N{Normal}')[:term]
-      match[:atom][:atom_code].must_equal 'N'
+      match[:compound][:compound_code].must_equal 'N'
       match[:annotation].must_equal 'Normal'
     end
   end
@@ -72,36 +65,35 @@ describe Unitwise::Expression::Parser do
   describe '#group' do
     it "must match parentheses with a term" do
       match = subject.group.parse('(s2)')[:group][:nested][:left][:term]
-      match[:atom][:atom_code].must_equal 's'
+      match[:compound][:compound_code].must_equal 's'
       match[:exponent][:integer].must_equal '2'
     end
     it "must match nested groups" do
       match = subject.group.parse('((kg))')[:group][:nested][:left][:group][:nested][:left][:term]
-      match[:atom][:atom_code].must_equal 'g'
-      match[:prefix][:prefix_code].must_equal 'k'
+      match[:compound][:compound_code].must_equal 'kg'
     end
     it "must pass exponents down" do
       match = subject.group.parse('([in_i])3')[:group]
       match[:exponent][:integer].must_equal '3'
-      match[:nested][:left][:term][:atom][:atom_code].must_equal '[in_i]'
+      match[:nested][:left][:term][:compound][:compound_code].must_equal '[in_i]'
     end
   end
 
   describe "#expression" do
     it "must match left only" do
       match = subject.expression.parse('m')
-      match[:left][:term][:atom][:atom_code].must_equal("m")
+      match[:left][:term][:compound][:compound_code].must_equal("m")
     end
     it "must match left + right + operator" do
       match = subject.expression.parse('m.s')
-      match[:left][:term][:atom][:atom_code].must_equal("m")
+      match[:left][:term][:compound][:compound_code].must_equal("m")
       match[:operator].must_equal('.')
-      match[:right][:left][:term][:atom][:atom_code].must_equal('s')
+      match[:right][:left][:term][:compound][:compound_code].must_equal('s')
     end
     it "must match operator + right" do
       match = subject.expression.parse("/s")
       match[:operator].must_equal('/')
-      match[:right][:left][:term][:atom][:atom_code].must_equal('s')
+      match[:right][:left][:term][:compound][:compound_code].must_equal('s')
     end
   end
 

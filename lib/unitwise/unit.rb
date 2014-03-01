@@ -1,12 +1,18 @@
 module Unitwise
+  # A Unitwise::Unit is essentially a collection of terms
+  # This class should be considered privateish.
   class Unit
     liner :expression, :terms
 
     include Unitwise::Composable
 
+    # Create a new Unit
+    # @param input [Array, String]
+    # @api public
     def initialize(input)
       if input.respond_to?(:expression)
         @expression = input.expression
+        @terms = input.terms
       elsif input.respond_to?(:each)
         @terms = input
       else
@@ -27,7 +33,7 @@ module Unitwise
     end
 
     def special?
-      terms.count == 1 && terms.all?(&:special?)
+      terms.count >=1 && terms.all?(&:special?)
     end
 
     def functional(x=scalar, forward=true)
