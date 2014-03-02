@@ -2,8 +2,16 @@ module Unitwise
   module Expression
     class Matcher
       class << self
-        def compound(method)
-          new(Compound.all, method).alternative
+        def atom(method)
+          new(Atom.all, method).alternative
+        end
+
+        def metric_atom(method)
+          new(Atom.all.select(&:metric?), method).alternative
+        end
+
+        def prefix(method)
+          new(Prefix.all, method).alternative
         end
       end
 
